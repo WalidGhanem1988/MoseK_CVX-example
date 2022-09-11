@@ -1,0 +1,61 @@
+
+clear all
+clc
+close all
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define parameters
+N = 5;
+M = 4;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define input
+a = [3; 0; 2; 0; 1];
+b = [5; 7; -1; -1; 1];
+c = [1; 1; 1; 1];
+e = 3;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                ILP program                % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% For initial testing, use T = [3];
+% T = [3];
+T = [1:20];
+L = length(T);
+
+% Allocate memory
+obj = zeros(size(T));
+for t=1:length(T)
+% Run simulations with different value of t for t = 1:L
+
+     % Select a solver
+     cvx_solver mosek
+
+     cvx_begin
+
+         % Define variables
+         variable x(N,1) binary
+         variable y(M,1) binary
+
+         maximize(a'*x)
+
+         % Define the constraints
+         subject to
+
+         b'*x <= c'*y;
+         sum(y) <= T(t);
+
+     cvx_end
+
+     % Objective value
+     obj(t) = a'*x;
+
+
+end
+
+figure(1)
+plot(T,obj,'-o')
+xlabel('T')
+ylabel('Objective')
